@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Indian Culture Quiz</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --primary: #ff6b35;
+            --primary-hover: #e85a24;
+            --text-color: #2b2d42;
+            --accent-correct: #2a9d8f;
+            --accent-wrong: #e76f51;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 650px;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        p.subtitle {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .question-card {
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: var(--bg-color);
+            border: 2px solid #e2e8f0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-color);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #fff6f2;
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        #result-screen {
+            text-align: center;
+            display: none;
+        }
+
+        #result-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        #result-screen .score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+
+        #result-screen .feedback {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <header>
+        <h1>How Well Do You Know My World?</h1>
+        <p class="subtitle">The Ultimate Indian Culture Quiz</p>
+    </header>
+
+    <div id="quiz-screen">
+        <div class="question-card">
+            <div class="question-text" id="question-text">Loading question...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div class="controls">
+            <span class="progress" id="progress-text">Question 1 of 8</span>
+            <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>Next Question</button>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h2>Quiz Complete!</h2>
+        <div class="score" id="final-score">0 / 8</div>
+        <div class="feedback" id="feedback-text"></div>
+        <button class="btn" onclick="restartQuiz()">Try Again</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "You walk into an Indian household. What is the absolute FIRST thing you must do?",
+            options: [
+                "Hand over a formal gift basket.",
+                "Take off your shoes immediately at the door.",
+                "Bow low and ask for the wifi password.",
+                "Compliment the curtains."
+            ],
+            answer: 1
+        },
+        {
+            q: "If an Indian mother offers you food and you say, 'No thank you, I’m full,' what actually happens next?",
+            options: [
+                "She respects your boundaries and clears the table.",
+                "She smiles and offers you a light glass of water instead.",
+                "She serves you a massive second plate anyway because 'you look too skinny.'",
+                "She takes it personally and asks if you hate her cooking."
+            ],
+            answer: 2
+        },
+        {
+            q: "What is the universal, multi-purpose Indian gesture known as the 'Head Bobble' used for?",
+            options: [
+                "Yes",
+                "Maybe / I understand",
+                "Sure, why not?",
+                "All of the above, depending on speed and angle."
+            ],
+            answer: 3
+        },
+        {
+            q: "What is the designated official function of a blue Royal Dansk Butter Cookie tin in an Indian home?",
+            options: [
+                "Holding delicious butter cookies.",
+                "Storing sewing supplies, needles, and random buttons.",
+                "Hiding secret emergency stash cash.",
+                "A decorative paperweight."
+            ],
+            answer: 1
+        },
+        {
+            q: "In Indian culture, what does '5 minutes away' actually mean when meeting up?",
+            options: [
+                "Exactly 300 seconds.",
+                "I am putting on my shoes and leaving the house in 20 minutes.",
+                "I am stuck in traffic two towns over.",
+                "Both B and C."
+            ],
+            answer: 3
+        },
+        {
+            q: "What happens if you accidentally bump your foot against a book, paper, or person?",
+            options: [
+                "Say 'Excuse me' and keep walking.",
+                "Ignore it; feet happen.",
+                "Touch the object/person with your hand, then touch your forehead as a sign of respect.",
+                "Apologize profusely in three languages."
+            ],
+            answer: 2
+        },
+        {
+            q: "What is Chai, and how should it NEVER be ordered?",
+            options: [
+                "It’s spiced tea, and you should never call it 'Chai Tea' ('Tea Tea').",
+                "It’s iced coffee with cinnamon.",
+                "It’s a smoothie bowl topping.",
+                "It’s only drank after 10 PM."
+            ],
+            answer: 0
+        },
+        {
+            q: "What is the primary role of 'Aunties' in the community ecosystem?",
+            options: [
+                "Organizing local neighborhood watch programs.",
+                "Running a high-efficiency, unofficial FBI-level intelligence and matchmaking network.",
+                "Teaching professional yoga classes.",
+                "Distributing baked goods on weekends."
+            ],
+            answer: 1
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let selectedOptionIndex = null;
+
+    function loadQuestion() {
+        selectedOptionIndex = null;
+        document.getElementById('next-btn').disabled = true;
+
+        const currentQ = questions[currentQuestionIndex];
+        document.getElementById('question-text').innerText = currentQ.q;
+        document.getElementById('progress-text').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        currentQ.options.forEach((option, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = option;
+            btn.onclick = () => selectOption(index, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectOption(index, btn) {
+        selectedOptionIndex = index;
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('next-btn').disabled = false;
+    }
+
+    function nextQuestion() {
+        if (selectedOptionIndex === questions[currentQuestionIndex].answer) {
+            score++;
+        }
+
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        const resultScreen = document.getElementById('result-screen');
+        resultScreen.style.display = 'block';
+
+        document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+        
+        const feedback = document.getElementById('feedback-text');
+        if (score >= 6) {
+            feedback.innerText = "Honorary Desi status achieved! You know the drill, you respect the chai, and you definitely take your shoes off at the door.";
+        } else if (score >= 3) {
+            feedback.innerText = "Getting there! You know enough to survive a dinner party, but watch out for the second helpings of food.";
+        } else {
+            feedback.innerText = "Cultural Bootcamp needed! Prepare for an intensive crash course involving fresh chai and a lesson on head bobbles.";
+        }
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
