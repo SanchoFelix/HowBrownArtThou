@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>How Well Do You Know My World?</title>
     <!-- Google Fonts for Elegant Cultural Aesthetics -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,7 +11,7 @@
     <style>
         :root {
             --bg-deep: #0b091a;
-            --card-glass: rgba(255, 255, 255, 0.96);
+            --card-glass: rgba(255, 255, 255, 0.98);
             --gold-primary: #d4af37;
             --gold-hover: #b89228;
             --text-dark: #1e1b2e;
@@ -20,87 +20,89 @@
             --correct-bg: rgba(16, 185, 129, 0.95);
             --wrong: #f43f5e;
             --wrong-bg: rgba(244, 63, 94, 0.95);
-            --border-radius: 20px;
+            --border-radius: 18px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            touch-action: manipulation; /* Prevents double-tap zoom on mobile */
+            -webkit-tap-highlight-color: transparent; /* Removes blue tap highlight */
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-deep);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
+                radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
             min-height: 100vh;
+            min-height: 100dvh; /* Mobile viewport fix */
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 12px;
             color: var(--text-dark);
             transition: background-color 0.8s ease;
-            overflow-x: hidden;
         }
 
         .quiz-container {
             background: var(--card-glass);
             width: 100%;
-            max-width: 680px;
-            padding: 30px;
+            max-width: 550px;
+            padding: clamp(16px, 4vw, 28px);
             border-radius: var(--border-radius);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4),
                         0 0 0 1px rgba(212, 175, 55, 0.3);
             position: relative;
             backdrop-filter: blur(10px);
         }
 
-        /* Sophisticated Feedback Animations */
+        /* Animations */
         @keyframes pulseGold {
             0% { transform: scale(1); }
-            50% { transform: scale(1.02); box-shadow: 0 0 35px rgba(212, 175, 55, 0.5); }
+            50% { transform: scale(1.015); box-shadow: 0 0 25px rgba(212, 175, 55, 0.4); }
             100% { transform: scale(1); }
         }
 
         @keyframes shakeRuby {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-10px); }
-            40%, 80% { transform: translateX(10px); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
         }
 
-        .quiz-container.correct-pulse { animation: pulseGold 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .quiz-container.wrong-shake { animation: shakeRuby 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+        .quiz-container.correct-pulse { animation: pulseGold 0.4s ease; }
+        .quiz-container.wrong-shake { animation: shakeRuby 0.4s ease; }
 
         header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 1.8rem;
+            font-size: clamp(1.3rem, 5vw, 1.7rem);
             color: #2a1b4e;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
         }
 
         p.subtitle {
             color: #786c96;
-            font-size: 0.92rem;
-            font-weight: 500;
+            font-size: clamp(0.75rem, 3vw, 0.85rem);
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
         }
 
         /* Progress Bar */
         .progress-bar-container {
             width: 100%;
             background: #e2e8f0;
-            height: 8px;
-            border-radius: 4px;
-            margin: 18px 0 22px 0;
+            height: 6px;
+            border-radius: 3px;
+            margin: 12px 0 16px 0;
             overflow: hidden;
         }
 
@@ -111,15 +113,14 @@
             transition: width 0.4s ease;
         }
 
-        /* Image Display Box */
+        /* Mobile Responsive Aspect-Ratio Image Container */
         .image-card {
             position: relative;
             width: 100%;
-            height: 220px;
-            border-radius: 14px;
+            aspect-ratio: 16 / 9;
+            border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 22px;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.15);
+            margin-bottom: 16px;
             background: #1e1b2e;
         }
 
@@ -127,34 +128,27 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s ease;
         }
 
-        .image-card:hover img {
-            transform: scale(1.03);
-        }
-
-        /* Animated Feedback Overlays */
+        /* Animated Mobile Overlays */
         .feedback-overlay {
             position: absolute;
             inset: 0;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
             opacity: 0;
             transform: translateY(-100%);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
-            backdrop-filter: blur(2px);
         }
 
         .feedback-overlay .status-title {
             font-family: 'Cinzel', serif;
-            font-size: 2rem;
+            font-size: clamp(1.4rem, 6vw, 1.9rem);
             font-weight: 800;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
         .feedback-overlay.show-correct {
@@ -170,38 +164,38 @@
         }
 
         .question-text {
-            font-size: 1.15rem;
+            font-size: clamp(0.95rem, 4vw, 1.1rem);
             font-weight: 700;
             color: var(--text-dark);
-            margin-bottom: 18px;
-            line-height: 1.45;
-            min-height: 52px;
+            margin-bottom: 14px;
+            line-height: 1.4;
         }
 
         .options-grid {
             display: grid;
-            gap: 12px;
+            gap: 10px;
         }
 
+        /* Touch-Optimized Buttons */
         .option-btn {
             background: #f8fafc;
             border: 2px solid #e2e8f0;
-            padding: 14px 18px;
-            border-radius: 12px;
+            padding: clamp(10px, 3.2vw, 14px) 14px;
+            border-radius: 10px;
             text-align: left;
-            font-size: 0.98rem;
+            font-size: clamp(0.88rem, 3.5vw, 0.95rem);
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
             color: var(--text-dark);
             font-weight: 500;
             line-height: 1.35;
+            min-height: 48px; /* Standard mobile touch target */
+            display: flex;
+            align-items: center;
         }
 
-        .option-btn:hover:not(:disabled) {
-            border-color: var(--gold-primary);
-            background: #fffdf5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+        .option-btn:active:not(:disabled) {
+            transform: scale(0.98);
         }
 
         .option-btn.correct {
@@ -220,26 +214,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 25px;
+            margin-top: 18px;
         }
 
         .btn {
             background: linear-gradient(135deg, var(--gold-primary), var(--gold-hover));
             color: white;
             border: none;
-            padding: 12px 28px;
-            border-radius: 10px;
-            font-size: 0.98rem;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-size: 0.95rem;
             cursor: pointer;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
-        }
-
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+            min-height: 44px;
         }
 
         .btn:disabled {
@@ -249,39 +239,38 @@
         }
 
         .progress-text {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             font-weight: 600;
         }
 
-        /* Result Screen */
+        /* Mobile Result Screen */
         #result-screen {
             text-align: center;
             display: none;
-            padding: 20px 0;
+            padding: 10px 0;
         }
 
         #result-screen h2 {
             font-family: 'Cinzel', serif;
-            font-size: 2.2rem;
+            font-size: clamp(1.6rem, 6vw, 2.2rem);
             color: #2a1b4e;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         #result-screen .score {
             font-family: 'Cinzel', serif;
-            font-size: 3.8rem;
+            font-size: clamp(2.8rem, 10vw, 3.8rem);
             font-weight: 800;
             color: var(--gold-primary);
-            margin: 15px 0;
-            text-shadow: 0 4px 10px rgba(212, 175, 55, 0.2);
+            margin: 10px 0;
         }
 
         #result-screen .feedback {
-            font-size: 1.15rem;
+            font-size: clamp(0.95rem, 4vw, 1.1rem);
             color: #475569;
-            margin-bottom: 30px;
-            line-height: 1.6;
+            margin-bottom: 24px;
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -312,7 +301,7 @@
 
         <div class="controls">
             <span class="progress-text" id="progress-text">Question 1 of 15</span>
-            <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>Next Question</button>
+            <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>Next</button>
         </div>
     </div>
 
@@ -325,7 +314,6 @@
 </div>
 
 <script>
-    // Rich background palette transitions per question
     const bgColors = [
         "#0f172a", "#1e1b4b", "#064e3b", "#7c2d12", "#4c1d95",
         "#134e4a", "#312e81", "#1e3a8a", "#0f766e", "#831843",
@@ -342,13 +330,13 @@
         {
             q: "2. If an Indian mother offers you food and you say, 'No thank you, I’m full,' what actually happens next?",
             img: "https://images.unsplash.com/photo-1613292443284-8d10ef9383fe?w=800&auto=format&fit=crop&q=80",
-            options: ["She respects your boundaries and clears the table", "She offers a light glass of water instead", "She serves a massive second plate anyway because 'you look skinny'", "She takes it personally and asks if you hate her cooking"],
+            options: ["She respects your boundaries and clears the table", "She offers a light glass of water instead", "She serves a massive second plate anyway", "She takes it personally and asks if you hate her cooking"],
             answer: 2
         },
         {
             q: "3. What is the universal, multi-purpose Indian gesture known as the 'Head Bobble' used for?",
             img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
-            options: ["Yes", "Maybe / I understand", "Sure, why not?", "All of the above, depending on speed, angle, and context"],
+            options: ["Yes", "Maybe / I understand", "Sure, why not?", "All of the above, depending on speed and context"],
             answer: 3
         },
         {
@@ -372,7 +360,7 @@
         {
             q: "7. What is Chai, and how should it NEVER be ordered?",
             img: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800&auto=format&fit=crop&q=80",
-            options: ["It's spiced tea, and never call it 'Chai Tea' (which literally means 'Tea Tea')", "It's iced coffee with cinnamon", "It's a smoothie bowl topping", "It's only consumed after midnight"],
+            options: ["It's spiced tea, and never call it 'Chai Tea' ('Tea Tea')", "It's iced coffee with cinnamon", "It's a smoothie bowl topping", "It's only consumed after midnight"],
             answer: 0
         },
         {
@@ -382,7 +370,7 @@
             answer: 1
         },
         {
-            q: "9. How many times must you be offered refreshments at a host's home before it is polite to accept?",
+            q: "9. How many times must you be offered refreshments before it is polite to accept?",
             img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80",
             options: ["Immediately on the first try", "Refuse at least twice before reluctantly accepting on the third offer", "Wait 45 minutes silently", "You must bring your own snacks"],
             answer: 1
@@ -390,19 +378,19 @@
         {
             q: "10. What is the primary function of the spice box (Masala Dabba) in the kitchen?",
             img: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&auto=format&fit=crop&q=80",
-            options: ["A decorative counter ornament", "Contains 7 essential spices that drive every meal's flavor profile", "A secret box for storing candy", "A container for loose change"],
+            options: ["A decorative counter ornament", "Contains 7 essential spices that drive every meal's flavor", "A secret box for storing candy", "A container for loose change"],
             answer: 1
         },
         {
             q: "11. Why do older family members hand you cash tucked into an envelope before you leave?",
             img: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&auto=format&fit=crop&q=80",
-            options: ["It's a mistake; give it right back", "Blessing/Love (Aashirwad) — accept it after a brief polite token refusal", "Payment for visiting them", "To pay for your ride home"],
+            options: ["It's a mistake; give it right back", "Blessing/Love (Aashirwad) — accept it after a brief polite refusal", "Payment for visiting them", "To pay for your ride home"],
             answer: 1
         },
         {
             q: "12. What is Bollywood, really?",
             img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80",
-            options: ["Just regular movies made in Hollywood", "An explosion of drama, romance, epic dance numbers, and 3-hour cinematic sagas", "A sports league", "A type of street food"],
+            options: ["Just regular movies made in Hollywood", "An explosion of drama, romance, epic dance numbers, and 3-hour sagas", "A sports league", "A type of street food"],
             answer: 1
         },
         {
@@ -433,20 +421,17 @@
         answered = false;
         document.getElementById('next-btn').disabled = true;
         
-        // Reset feedback overlay
         const overlay = document.getElementById('feedback-overlay');
         overlay.className = 'feedback-overlay';
         document.getElementById('status-title').innerText = '';
 
-        // Transition background theme
         document.body.style.backgroundColor = bgColors[currentQuestionIndex % bgColors.length];
 
         const currentQ = questions[currentQuestionIndex];
         document.getElementById('question-text').innerText = currentQ.q;
         document.getElementById('question-image').src = currentQ.img;
-        document.getElementById('progress-text').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        document.getElementById('progress-text').innerText = `${currentQuestionIndex + 1} of ${questions.length}`;
 
-        // Progress bar update
         const progressPercent = (currentQuestionIndex / questions.length) * 100;
         document.getElementById('progress-bar').style.width = `${progressPercent}%`;
 
@@ -482,7 +467,7 @@
             statusTitle.innerText = "✦ PERFECT! ✦";
             overlay.classList.add('show-correct');
 
-            setTimeout(() => card.classList.remove('correct-pulse'), 500);
+            setTimeout(() => card.classList.remove('correct-pulse'), 400);
         } else {
             selectedBtn.classList.add('wrong');
             allBtns[currentQ.answer].classList.add('correct');
@@ -491,7 +476,7 @@
             statusTitle.innerText = "✕ NOT QUITE!";
             overlay.classList.add('show-wrong');
 
-            setTimeout(() => card.classList.remove('wrong-shake'), 500);
+            setTimeout(() => card.classList.remove('wrong-shake'), 400);
         }
 
         document.getElementById('next-btn').disabled = false;
@@ -501,6 +486,7 @@
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.length) {
             loadQuestion();
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll back up on mobile
         } else {
             showResults();
         }
