@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Ultimate Indian Culture Quiz</title>
+    <title>The Ultimate Desi Quiz Game!</title>
     <style>
         :root {
-            --bg-color: #f4f6f9;
+            --bg-current: #1a1a2e;
             --card-bg: #ffffff;
-            --primary: #ff6b35;
-            --primary-hover: #e85a24;
             --text-color: #2b2d42;
-            --accent-correct: #2a9d8f;
-            --accent-wrong: #e76f51;
-            --border-radius: 12px;
+            --primary: #ff6b35;
+            --correct-color: #2a9d8f;
+            --wrong-color: #e76f51;
+            --border-radius: 16px;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-current);
+            transition: background-color 0.6s ease;
             color: var(--text-color);
             display: flex;
             justify-content: center;
@@ -26,6 +26,7 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            box-sizing: border-box;
         }
 
         .quiz-container {
@@ -34,19 +35,40 @@
             max-width: 650px;
             padding: 30px;
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animations */
+        @keyframes pulseSuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(42, 157, 143, 0.6); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .quiz-container.pulse {
+            animation: pulseSuccess 0.5s ease;
+        }
+
+        .quiz-container.shake {
+            animation: shakeError 0.5s ease;
         }
 
         header {
             text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 2px solid var(--bg-color);
-            padding-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         h1 {
-            margin: 0 0 10px 0;
-            color: var(--primary);
+            margin: 0 0 5px 0;
+            color: #ff6b35;
             font-size: 1.8rem;
         }
 
@@ -56,42 +78,63 @@
             font-size: 0.95rem;
         }
 
-        .question-card {
-            margin-bottom: 20px;
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e9ecef;
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff6b35, #f72585);
+            transition: width 0.4s ease;
         }
 
         .question-text {
             font-size: 1.15rem;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            min-height: 55px;
         }
 
         .options-grid {
             display: grid;
-            gap: 10px;
+            gap: 12px;
         }
 
         .option-btn {
-            background: var(--bg-color);
-            border: 2px solid #e2e8f0;
-            padding: 12px 16px;
-            border-radius: 8px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 14px 18px;
+            border-radius: 10px;
             text-align: left;
             font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.2s ease;
             color: var(--text-color);
+            font-weight: 500;
         }
 
-        .option-btn:hover {
+        .option-btn:hover:not(:disabled) {
             border-color: var(--primary);
             background: #fff6f2;
+            transform: translateY(-2px);
         }
 
-        .option-btn.selected {
-            border-color: var(--primary);
-            background: var(--primary);
-            color: white;
+        .option-btn.correct {
+            background-color: var(--correct-color) !important;
+            color: white !important;
+            border-color: var(--correct-color) !important;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-color) !important;
+            color: white !important;
+            border-color: var(--wrong-color) !important;
         }
 
         .controls {
@@ -105,15 +148,16 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-size: 1rem;
             cursor: pointer;
             font-weight: 600;
+            transition: background 0.2s;
         }
 
         .btn:hover {
-            background: var(--primary-hover);
+            background: #e85a24;
         }
 
         .btn:disabled {
@@ -121,9 +165,10 @@
             cursor: not-allowed;
         }
 
-        .progress {
+        .progress-text {
             font-size: 0.9rem;
             color: #6c757d;
+            font-weight: 600;
         }
 
         #result-screen {
@@ -137,7 +182,7 @@
         }
 
         #result-screen .score {
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: bold;
             color: var(--primary);
             margin: 15px 0;
@@ -148,19 +193,19 @@
             margin-bottom: 25px;
             line-height: 1.5;
         }
-
-        .hidden {
-            display: none;
-        }
     </style>
 </head>
 <body>
 
-<div class="quiz-container">
+<div class="quiz-container" id="quiz-card">
     <header>
         <h1>How Well Do You Know My World?</h1>
-        <p class="subtitle">The Ultimate Indian Culture Quiz</p>
+        <p class="subtitle">The Ultimate 15-Question Desi Culture Quiz</p>
     </header>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
 
     <div id="quiz-screen">
         <div class="question-card">
@@ -169,114 +214,123 @@
         </div>
 
         <div class="controls">
-            <span class="progress" id="progress-text">Question 1 of 8</span>
+            <span class="progress-text" id="progress-text">Question 1 of 15</span>
             <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>Next Question</button>
         </div>
     </div>
 
     <div id="result-screen">
         <h2>Quiz Complete!</h2>
-        <div class="score" id="final-score">0 / 8</div>
+        <div class="score" id="final-score">0 / 15</div>
         <div class="feedback" id="feedback-text"></div>
-        <button class="btn" onclick="restartQuiz()">Try Again</button>
+        <button class="btn" onclick="restartQuiz()">Play Again</button>
     </div>
 </div>
 
 <script>
+    // Distinct theme colors for each question
+    const bgColors = [
+        "#2a0845", "#004e92", "#11998e", "#e65c00", "#4A0E4E",
+        "#0f2027", "#3a1c71", "#1e3c72", "#2b5876", "#16a085",
+        "#d35400", "#8e44ad", "#2c3e50", "#16a085", "#27ae60"
+    ];
+
     const questions = [
         {
-            q: "You walk into an Indian household. What is the absolute FIRST thing you must do?",
-            options: [
-                "Hand over a formal gift basket.",
-                "Take off your shoes immediately at the door.",
-                "Bow low and ask for the wifi password.",
-                "Compliment the curtains."
-            ],
+            q: "1. You walk into an Indian household. What is the absolute FIRST thing you must do?",
+            options: ["Hand over a gift basket", "Take off your shoes immediately at the door", "Ask for the WiFi password", "Compliment the curtains"],
             answer: 1
         },
         {
-            q: "If an Indian mother offers you food and you say, 'No thank you, I’m full,' what actually happens next?",
-            options: [
-                "She respects your boundaries and clears the table.",
-                "She smiles and offers you a light glass of water instead.",
-                "She serves you a massive second plate anyway because 'you look too skinny.'",
-                "She takes it personally and asks if you hate her cooking."
-            ],
+            q: "2. If an Indian mother offers you food and you say, 'No thank you, I’m full,' what actually happens next?",
+            options: ["She respects your boundaries", "She offers a light glass of water", "She serves a massive second plate anyway", "She asks if you hate her cooking"],
             answer: 2
         },
         {
-            q: "What is the universal, multi-purpose Indian gesture known as the 'Head Bobble' used for?",
-            options: [
-                "Yes",
-                "Maybe / I understand",
-                "Sure, why not?",
-                "All of the above, depending on speed and angle."
-            ],
+            q: "3. What is the universal, multi-purpose Indian gesture known as the 'Head Bobble' used for?",
+            options: ["Yes", "Maybe / I understand", "Sure, why not?", "All of the above, depending on speed and angle"],
             answer: 3
         },
         {
-            q: "What is the designated official function of a blue Royal Dansk Butter Cookie tin in an Indian home?",
-            options: [
-                "Holding delicious butter cookies.",
-                "Storing sewing supplies, needles, and random buttons.",
-                "Hiding secret emergency stash cash.",
-                "A decorative paperweight."
-            ],
+            q: "4. What is the designated official function of a blue Royal Dansk Butter Cookie tin in an Indian home?",
+            options: ["Holding butter cookies", "Storing sewing supplies, needles, and random buttons", "Hiding emergency cash", "A decorative paperweight"],
             answer: 1
         },
         {
-            q: "In Indian culture, what does '5 minutes away' actually mean when meeting up?",
-            options: [
-                "Exactly 300 seconds.",
-                "I am putting on my shoes and leaving the house in 20 minutes.",
-                "I am stuck in traffic two towns over.",
-                "Both B and C."
-            ],
+            q: "5. In Indian culture, what does '5 minutes away' actually mean when meeting up?",
+            options: ["Exactly 300 seconds", "I am putting on my shoes and leaving in 20 minutes", "I am stuck in traffic two towns over", "Both B and C"],
             answer: 3
         },
         {
-            q: "What happens if you accidentally bump your foot against a book, paper, or person?",
-            options: [
-                "Say 'Excuse me' and keep walking.",
-                "Ignore it; feet happen.",
-                "Touch the object/person with your hand, then touch your forehead as a sign of respect.",
-                "Apologize profusely in three languages."
-            ],
+            q: "6. What happens if you accidentally bump your foot against a book, paper, or person?",
+            options: ["Say 'Excuse me' and keep walking", "Ignore it; feet happen", "Touch the object/person with your hand, then your forehead out of respect", "Apologize profusely in three languages"],
             answer: 2
         },
         {
-            q: "What is Chai, and how should it NEVER be ordered?",
-            options: [
-                "It’s spiced tea, and you should never call it 'Chai Tea' ('Tea Tea').",
-                "It’s iced coffee with cinnamon.",
-                "It’s a smoothie bowl topping.",
-                "It’s only drank after 10 PM."
-            ],
+            q: "7. What is Chai, and how should it NEVER be ordered?",
+            options: ["Spiced tea, and never call it 'Chai Tea' ('Tea Tea')", "Iced coffee with cinnamon", "A smoothie bowl topping", "It's only drank after 10 PM"],
             answer: 0
         },
         {
-            q: "What is the primary role of 'Aunties' in the community ecosystem?",
-            options: [
-                "Organizing local neighborhood watch programs.",
-                "Running a high-efficiency, unofficial FBI-level intelligence and matchmaking network.",
-                "Teaching professional yoga classes.",
-                "Distributing baked goods on weekends."
-            ],
+            q: "8. What is the primary role of 'Aunties' in the community ecosystem?",
+            options: ["Organizing local neighborhood watch programs", "Running a high-efficiency intelligence and matchmaking network", "Teaching professional yoga classes", "Distributing baked goods on weekends"],
+            answer: 1
+        },
+        {
+            q: "9. You visit an Indian relative's house. How many times must you be offered refreshments before it is polite to accept?",
+            options: ["Immediately on the first try", "Refuse at least twice before reluctantly accepting on the third offer", "Wait 45 minutes silently", "You must bring your own snacks"],
+            answer: 1
+        },
+        {
+            q: "10. What is the primary function of the spice box (Masala Dabba) in the kitchen?",
+            options: ["Decorative counter ornament", "Contains 7 essential spices every dish depends on", "A secret box for storing candy", "Holds loose change"],
+            answer: 1
+        },
+        {
+            q: "11. Why do older family members hand you cash tucked into an envelope (or directly) before you leave their house?",
+            options: ["It's a mistake; give it right back", "Blessing/Love (Aashirwad) — accept it after a brief polite token refusal", "Payment for visiting them", "To pay for your Uber"],
+            answer: 1
+        },
+        {
+            q: "12. What is Bollywood, really?",
+            options: ["Just regular movies made in Hollywood", "An explosion of drama, romance, epic dance numbers, and 3-hour cinematic sagas", "A sports league", "A type of street food"],
+            answer: 1
+        },
+        {
+            q: "13. What is 'Nimbu Mirchi' (a lemon and 7 green chilies tied on a string) used for?",
+            options: ["Making instant hot sauce", "Warding off the 'evil eye' (Nazar) from homes and cars", "A festive Christmas tree ornament", "A natural air freshener"],
+            answer: 1
+        },
+        {
+            q: "14. How are leftovers typically stored in an Indian refrigerator?",
+            options: ["In clear, labeled Tupperware containers", "In reused yogurt, ice cream, or takeout containers", "Wrapped neatly in aluminum foil", "Left uncovered on the top shelf"],
+            answer: 1
+        },
+        {
+            q: "15. What is the official state of mind on Sunday afternoons after a heavy meal of Biryani or Rajma Chawal?",
+            options: ["Ready to go for a 5-mile jog", "Deep, unbreakable 'Food Coma' nap time", "Time to clean the entire house", "Answering work emails"],
             answer: 1
         }
     ];
 
     let currentQuestionIndex = 0;
     let score = 0;
-    let selectedOptionIndex = null;
+    let answered = false;
 
     function loadQuestion() {
-        selectedOptionIndex = null;
+        answered = false;
         document.getElementById('next-btn').disabled = true;
+        
+        // Dynamic theme background change
+        document.body.style.backgroundColor = bgColors[currentQuestionIndex % bgColors.length];
 
         const currentQ = questions[currentQuestionIndex];
         document.getElementById('question-text').innerText = currentQ.q;
         document.getElementById('progress-text').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+
+        // Progress bar update
+        const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = `${progressPercent}%`;
 
         const optionsContainer = document.getElementById('options-container');
         optionsContainer.innerHTML = '';
@@ -285,24 +339,38 @@
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = option;
-            btn.onclick = () => selectOption(index, btn);
+            btn.onclick = () => handleAnswer(index, btn);
             optionsContainer.appendChild(btn);
         });
     }
 
-    function selectOption(index, btn) {
-        selectedOptionIndex = index;
+    function handleAnswer(selectedIndex, selectedBtn) {
+        if (answered) return;
+        answered = true;
+
+        const currentQ = questions[currentQuestionIndex];
+        const card = document.getElementById('quiz-card');
         const allBtns = document.querySelectorAll('.option-btn');
-        allBtns.forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
+
+        // Disable all buttons to prevent double-clicking
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selectedIndex === currentQ.answer) {
+            score++;
+            selectedBtn.classList.add('correct');
+            card.classList.add('pulse');
+            setTimeout(() => card.classList.remove('pulse'), 500);
+        } else {
+            selectedBtn.classList.add('wrong');
+            allBtns[currentQ.answer].classList.add('correct'); // Highlight true answer
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 500);
+        }
+
         document.getElementById('next-btn').disabled = false;
     }
 
     function nextQuestion() {
-        if (selectedOptionIndex === questions[currentQuestionIndex].answer) {
-            score++;
-        }
-
         currentQuestionIndex++;
 
         if (currentQuestionIndex < questions.length) {
@@ -314,18 +382,21 @@
 
     function showResults() {
         document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('progress-bar').style.width = '100%';
+        document.body.style.backgroundColor = "#1a1a2e";
+
         const resultScreen = document.getElementById('result-screen');
         resultScreen.style.display = 'block';
 
         document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
         
         const feedback = document.getElementById('feedback-text');
-        if (score >= 6) {
-            feedback.innerText = "Honorary Desi status achieved! You know the drill, you respect the chai, and you definitely take your shoes off at the door.";
-        } else if (score >= 3) {
-            feedback.innerText = "Getting there! You know enough to survive a dinner party, but watch out for the second helpings of food.";
+        if (score >= 12) {
+            feedback.innerText = "🏆 Certified Desi Royalty! You know the rules, respect the chai, and could easily negotiate with the Aunties.";
+        } else if (score >= 7) {
+            feedback.innerText = "👍 Solid effort! You'll easily survive family dinners, but keep an eye out for surprise second helpings!";
         } else {
-            feedback.innerText = "Cultural Bootcamp needed! Prepare for an intensive crash course involving fresh chai and a lesson on head bobbles.";
+            feedback.innerText = "🌶️ Cultural Bootcamp Needed! Time for a crash course in fresh chai, head bobbles, and shoe etiquette.";
         }
     }
 
