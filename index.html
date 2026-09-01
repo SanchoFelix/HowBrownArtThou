@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Ultimate Desi Quiz Game!</title>
+    <title>How Well Do You Know My World?</title>
     <style>
         :root {
-            --bg-current: #1a1a2e;
+            --bg-current: #0f172a;
             --card-bg: #ffffff;
-            --text-color: #2b2d42;
+            --text-color: #1e293b;
             --primary: #ff6b35;
-            --correct-color: #2a9d8f;
-            --wrong-color: #e76f51;
-            --border-radius: 16px;
+            --correct-color: #10b981;
+            --wrong-color: #ef4444;
+            --border-radius: 20px;
         }
 
         body {
@@ -32,58 +32,53 @@
         .quiz-container {
             background: var(--card-bg);
             width: 100%;
-            max-width: 650px;
-            padding: 30px;
+            max-width: 680px;
+            padding: 25px;
             border-radius: var(--border-radius);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
         }
 
-        /* Animations */
+        /* Container Keyframe Animations */
         @keyframes pulseSuccess {
             0% { transform: scale(1); }
-            50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(42, 157, 143, 0.6); }
+            50% { transform: scale(1.02); box-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
             100% { transform: scale(1); }
         }
 
         @keyframes shakeError {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-10px); }
-            40%, 80% { transform: translateX(10px); }
+            20%, 60% { transform: translateX(-12px); }
+            40%, 80% { transform: translateX(12px); }
         }
 
-        .quiz-container.pulse {
-            animation: pulseSuccess 0.5s ease;
-        }
-
-        .quiz-container.shake {
-            animation: shakeError 0.5s ease;
-        }
+        .quiz-container.pulse { animation: pulseSuccess 0.5s ease; }
+        .quiz-container.shake { animation: shakeError 0.5s ease; }
 
         header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         h1 {
             margin: 0 0 5px 0;
-            color: #ff6b35;
-            font-size: 1.8rem;
+            color: var(--primary);
+            font-size: 1.6rem;
         }
 
         p.subtitle {
             margin: 0;
-            color: #6c757d;
-            font-size: 0.95rem;
+            color: #64748b;
+            font-size: 0.9rem;
         }
 
         .progress-bar-container {
             width: 100%;
-            background-color: #e9ecef;
-            height: 10px;
-            border-radius: 5px;
-            margin: 20px 0;
+            background-color: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            margin: 15px 0;
             overflow: hidden;
         }
 
@@ -94,22 +89,71 @@
             transition: width 0.4s ease;
         }
 
-        .question-text {
-            font-size: 1.15rem;
-            font-weight: 600;
+        /* Pictorial Representation Container */
+        .image-card {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
             margin-bottom: 20px;
-            min-height: 55px;
+            background-color: #f1f5f9;
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        /* Animated Answer Overlay */
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            opacity: 0;
+            transform: translateY(-100%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .feedback-overlay.show-correct {
+            opacity: 1;
+            transform: translateY(0);
+            background: rgba(16, 185, 129, 0.88);
+        }
+
+        .feedback-overlay.show-wrong {
+            opacity: 1;
+            transform: translateY(0);
+            background: rgba(239, 68, 68, 0.88);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            min-height: 48px;
         }
 
         .options-grid {
             display: grid;
-            gap: 12px;
+            gap: 10px;
         }
 
         .option-btn {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            padding: 14px 18px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 12px 16px;
             border-radius: 10px;
             text-align: left;
             font-size: 0.95rem;
@@ -141,7 +185,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 25px;
+            margin-top: 20px;
         }
 
         .btn {
@@ -156,43 +200,24 @@
             transition: background 0.2s;
         }
 
-        .btn:hover {
-            background: #e85a24;
-        }
-
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
+        .btn:hover { background: #e85a24; }
+        .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
 
         .progress-text {
             font-size: 0.9rem;
-            color: #6c757d;
+            color: #64748b;
             font-weight: 600;
         }
 
         #result-screen {
             text-align: center;
             display: none;
+            padding: 20px 0;
         }
 
-        #result-screen h2 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        #result-screen .score {
-            font-size: 3.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 15px 0;
-        }
-
-        #result-screen .feedback {
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
+        #result-screen h2 { font-size: 2rem; margin-bottom: 10px; }
+        #result-screen .score { font-size: 3.5rem; font-weight: bold; color: var(--primary); margin: 15px 0; }
+        #result-screen .feedback { font-size: 1.1rem; margin-bottom: 25px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -200,7 +225,7 @@
 <div class="quiz-container" id="quiz-card">
     <header>
         <h1>How Well Do You Know My World?</h1>
-        <p class="subtitle">The Ultimate 15-Question Desi Culture Quiz</p>
+        <p class="subtitle">The Ultimate Desi Culture Quiz</p>
     </header>
 
     <div class="progress-bar-container">
@@ -208,6 +233,11 @@
     </div>
 
     <div id="quiz-screen">
+        <div class="image-card">
+            <img id="question-image" src="" alt="Question Illustration">
+            <div id="feedback-overlay" class="feedback-overlay"></div>
+        </div>
+
         <div class="question-card">
             <div class="question-text" id="question-text">Loading question...</div>
             <div class="options-grid" id="options-container"></div>
@@ -228,86 +258,100 @@
 </div>
 
 <script>
-    // Distinct theme colors for each question
     const bgColors = [
-        "#2a0845", "#004e92", "#11998e", "#e65c00", "#4A0E4E",
-        "#0f2027", "#3a1c71", "#1e3c72", "#2b5876", "#16a085",
-        "#d35400", "#8e44ad", "#2c3e50", "#16a085", "#27ae60"
+        "#0f172a", "#1e1b4b", "#064e3b", "#7c2d12", "#4c1d95",
+        "#134e4a", "#312e81", "#1e3a8a", "#0f766e", "#831843",
+        "#701a75", "#365314", "#18181b", "#0284c7", "#15803d"
     ];
 
     const questions = [
         {
             q: "1. You walk into an Indian household. What is the absolute FIRST thing you must do?",
+            img: "https://images.unsplash.com/photo-1595052299224-b52ddb9e25b6?w=700&auto=format&fit=crop&q=80",
             options: ["Hand over a gift basket", "Take off your shoes immediately at the door", "Ask for the WiFi password", "Compliment the curtains"],
             answer: 1
         },
         {
             q: "2. If an Indian mother offers you food and you say, 'No thank you, I’m full,' what actually happens next?",
+            img: "https://images.unsplash.com/photo-1613292443284-8d10ef9383fe?w=700&auto=format&fit=crop&q=80",
             options: ["She respects your boundaries", "She offers a light glass of water", "She serves a massive second plate anyway", "She asks if you hate her cooking"],
             answer: 2
         },
         {
             q: "3. What is the universal, multi-purpose Indian gesture known as the 'Head Bobble' used for?",
+            img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=700&auto=format&fit=crop&q=80",
             options: ["Yes", "Maybe / I understand", "Sure, why not?", "All of the above, depending on speed and angle"],
             answer: 3
         },
         {
             q: "4. What is the designated official function of a blue Royal Dansk Butter Cookie tin in an Indian home?",
+            img: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=700&auto=format&fit=crop&q=80",
             options: ["Holding butter cookies", "Storing sewing supplies, needles, and random buttons", "Hiding emergency cash", "A decorative paperweight"],
             answer: 1
         },
         {
             q: "5. In Indian culture, what does '5 minutes away' actually mean when meeting up?",
+            img: "https://images.unsplash.com/photo-1508962914676-134849a727f0?w=700&auto=format&fit=crop&q=80",
             options: ["Exactly 300 seconds", "I am putting on my shoes and leaving in 20 minutes", "I am stuck in traffic two towns over", "Both B and C"],
             answer: 3
         },
         {
             q: "6. What happens if you accidentally bump your foot against a book, paper, or person?",
+            img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=700&auto=format&fit=crop&q=80",
             options: ["Say 'Excuse me' and keep walking", "Ignore it; feet happen", "Touch the object/person with your hand, then your forehead out of respect", "Apologize profusely in three languages"],
             answer: 2
         },
         {
             q: "7. What is Chai, and how should it NEVER be ordered?",
+            img: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=700&auto=format&fit=crop&q=80",
             options: ["Spiced tea, and never call it 'Chai Tea' ('Tea Tea')", "Iced coffee with cinnamon", "A smoothie bowl topping", "It's only drank after 10 PM"],
             answer: 0
         },
         {
             q: "8. What is the primary role of 'Aunties' in the community ecosystem?",
+            img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=700&auto=format&fit=crop&q=80",
             options: ["Organizing local neighborhood watch programs", "Running a high-efficiency intelligence and matchmaking network", "Teaching professional yoga classes", "Distributing baked goods on weekends"],
             answer: 1
         },
         {
-            q: "9. You visit an Indian relative's house. How many times must you be offered refreshments before it is polite to accept?",
+            q: "9. How many times must you be offered refreshments before it is polite to accept?",
+            img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700&auto=format&fit=crop&q=80",
             options: ["Immediately on the first try", "Refuse at least twice before reluctantly accepting on the third offer", "Wait 45 minutes silently", "You must bring your own snacks"],
             answer: 1
         },
         {
             q: "10. What is the primary function of the spice box (Masala Dabba) in the kitchen?",
+            img: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=700&auto=format&fit=crop&q=80",
             options: ["Decorative counter ornament", "Contains 7 essential spices every dish depends on", "A secret box for storing candy", "Holds loose change"],
             answer: 1
         },
         {
-            q: "11. Why do older family members hand you cash tucked into an envelope (or directly) before you leave their house?",
+            q: "11. Why do older family members hand you cash tucked into an envelope before you leave?",
+            img: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=700&auto=format&fit=crop&q=80",
             options: ["It's a mistake; give it right back", "Blessing/Love (Aashirwad) — accept it after a brief polite token refusal", "Payment for visiting them", "To pay for your Uber"],
             answer: 1
         },
         {
             q: "12. What is Bollywood, really?",
+            img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=700&auto=format&fit=crop&q=80",
             options: ["Just regular movies made in Hollywood", "An explosion of drama, romance, epic dance numbers, and 3-hour cinematic sagas", "A sports league", "A type of street food"],
             answer: 1
         },
         {
-            q: "13. What is 'Nimbu Mirchi' (a lemon and 7 green chilies tied on a string) used for?",
+            q: "13. What is 'Nimbu Mirchi' (lemon and green chilies on a string) used for?",
+            img: "https://images.unsplash.com/photo-1588347818036-558601350947?w=700&auto=format&fit=crop&q=80",
             options: ["Making instant hot sauce", "Warding off the 'evil eye' (Nazar) from homes and cars", "A festive Christmas tree ornament", "A natural air freshener"],
             answer: 1
         },
         {
             q: "14. How are leftovers typically stored in an Indian refrigerator?",
-            options: ["In clear, labeled Tupperware containers", "In reused yogurt, ice cream, or takeout containers", "Wrapped neatly in aluminum foil", "Left uncovered on the top shelf"],
+            img: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=700&auto=format&fit=crop&q=80",
+            options: ["In clear, labeled Tupperware containers", "In reused yogurt, ice cream, or takeout containers", "Wrapped neatly in aluminum foil", "Left uncovered on top shelf"],
             answer: 1
         },
         {
-            q: "15. What is the official state of mind on Sunday afternoons after a heavy meal of Biryani or Rajma Chawal?",
+            q: "15. What is the official state of mind on Sunday afternoons after a heavy meal of Biryani?",
+            img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=700&auto=format&fit=crop&q=80",
             options: ["Ready to go for a 5-mile jog", "Deep, unbreakable 'Food Coma' nap time", "Time to clean the entire house", "Answering work emails"],
             answer: 1
         }
@@ -321,15 +365,21 @@
         answered = false;
         document.getElementById('next-btn').disabled = true;
         
-        // Dynamic theme background change
+        // Reset animated overlay
+        const overlay = document.getElementById('feedback-overlay');
+        overlay.className = 'feedback-overlay';
+        overlay.innerText = '';
+
+        // Update Theme Background
         document.body.style.backgroundColor = bgColors[currentQuestionIndex % bgColors.length];
 
         const currentQ = questions[currentQuestionIndex];
         document.getElementById('question-text').innerText = currentQ.q;
+        document.getElementById('question-image').src = currentQ.img;
         document.getElementById('progress-text').innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
 
-        // Progress bar update
-        const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
+        // Progress Bar
+        const progressPercent = (currentQuestionIndex / questions.length) * 100;
         document.getElementById('progress-bar').style.width = `${progressPercent}%`;
 
         const optionsContainer = document.getElementById('options-container');
@@ -350,20 +400,30 @@
 
         const currentQ = questions[currentQuestionIndex];
         const card = document.getElementById('quiz-card');
+        const overlay = document.getElementById('feedback-overlay');
         const allBtns = document.querySelectorAll('.option-btn');
 
-        // Disable all buttons to prevent double-clicking
         allBtns.forEach(b => b.disabled = true);
 
         if (selectedIndex === currentQ.answer) {
             score++;
             selectedBtn.classList.add('correct');
             card.classList.add('pulse');
+            
+            // Image Visual Feedback overlay
+            overlay.innerText = "✓ CORRECT!";
+            overlay.classList.add('show-correct');
+
             setTimeout(() => card.classList.remove('pulse'), 500);
         } else {
             selectedBtn.classList.add('wrong');
-            allBtns[currentQ.answer].classList.add('correct'); // Highlight true answer
+            allBtns[currentQ.answer].classList.add('correct');
             card.classList.add('shake');
+
+            // Image Visual Feedback overlay
+            overlay.innerText = "✕ INCORRECT";
+            overlay.classList.add('show-wrong');
+
             setTimeout(() => card.classList.remove('shake'), 500);
         }
 
@@ -372,7 +432,6 @@
 
     function nextQuestion() {
         currentQuestionIndex++;
-
         if (currentQuestionIndex < questions.length) {
             loadQuestion();
         } else {
@@ -383,7 +442,7 @@
     function showResults() {
         document.getElementById('quiz-screen').style.display = 'none';
         document.getElementById('progress-bar').style.width = '100%';
-        document.body.style.backgroundColor = "#1a1a2e";
+        document.body.style.backgroundColor = "#0f172a";
 
         const resultScreen = document.getElementById('result-screen');
         resultScreen.style.display = 'block';
